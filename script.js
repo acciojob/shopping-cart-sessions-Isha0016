@@ -9,30 +9,54 @@ const products = [
   { id: 5, name: "Product 5", price: 50 },
 ];
 
-// DOM elements
 const productList = document.getElementById("product-list");
+const cartList = document.getElementById("cart-list");
+const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Render product list
+// Retrieve existing cart data from sessionStorage or initialize an empty array
+let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+
+// Render the product list on the page
 function renderProducts() {
-  products.forEach((product) => {
+  productList.innerHTML = "";
+  products.forEach(product => {
     const li = document.createElement("li");
     li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
     productList.appendChild(li);
   });
 }
 
-// Render cart list
-function renderCart() {}
+// Render the shopping cart items on the page
+function renderCart() {
+  cartList.innerHTML = "";
+  cart.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.name} - $${item.price}`;
+    cartList.appendChild(li);
+  });
+}
 
-// Add item to cart
-function addToCart(productId) {}
-
-// Remove item from cart
-function removeFromCart(productId) {}
-
-// Clear cart
-function clearCart() {}
-
-// Initial render
+// Initial render calls
 renderProducts();
 renderCart();
+
+// Event listener to handle adding items to the cart
+productList.addEventListener("click", (e) => {
+  if (e.target.classList.contains("add-to-cart-btn")) {
+    const productId = parseInt(e.target.getAttribute("data-id"));
+    const selectedProduct = products.find(p => p.id === productId);
+    
+    if (selectedProduct) {
+      cart.push(selectedProduct);
+      sessionStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    }
+  }
+});
+
+// Event listener to clear the cart and sessionStorage
+clearCartBtn.addEventListener("click", () => {
+  cart = [];
+  sessionStorage.removeItem("cart");
+  renderCart();
+});
